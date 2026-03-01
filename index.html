@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CardForge Pro — CC Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="particles"></canvas>
+
+  <div class="wrapper">
+
+    <!-- Header -->
+    <header>
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+        </div>
+        <h1>CardForge Pro</h1>
+      </div>
+      <p>Advanced Credit Card Generator &amp; Manager</p>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="generator" onclick="switchTab('generator', this)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        Generator
+      </button>
+      <button class="tab-btn" data-tab="saved-bins" onclick="switchTab('saved-bins', this)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        Saved BINs
+      </button>
+      <button class="tab-btn" data-tab="saved-ccs" onclick="switchTab('saved-ccs', this)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        Saved CCs
+      </button>
+    </div>
+
+    <!-- Generator Tab -->
+    <div class="tab-content active" id="tab-generator">
+      <div class="main-grid">
+
+        <!-- LEFT: Input -->
+        <div style="display:flex; flex-direction:column; gap:16px;">
+
+          <!-- BIN Preview Card -->
+          <div class="bin-preview-card" id="binPreviewCard">
+            <div class="bpc-chip"></div>
+            <div class="bpc-number" id="bpcNumber">•••• •••• •••• ••••</div>
+            <div class="bpc-meta">
+              <span>Expires<strong id="bpcExpiry">MM/YY</strong></span>
+              <span>CVV<strong id="bpcCvv">•••</strong></span>
+              <span>Type<strong id="bpcType">—</strong></span>
+            </div>
+            <div class="bpc-network" id="bpcNetwork">VISA</div>
+          </div>
+
+          <!-- Generator Form -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="ph-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h2>Generator Config</h2>
+            </div>
+            <div class="panel-body">
+
+              <div class="field">
+                <label class="field-label">BIN / Pattern</label>
+                <div class="input-with-btn">
+                  <input type="text" id="binInput" placeholder="e.g. 4111xxxxxxxxxx or 411111" oninput="updatePreview()" autocomplete="off" />
+                  <button class="btn btn-ghost btn-sm" onclick="openBinPicker()" title="Load saved BIN">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  </button>
+                </div>
+                <div style="margin-top:6px; font-size:11px; color:var(--muted);">
+                  Use <code style="color:var(--accent2); font-family:'JetBrains Mono',monospace;">x</code> or <code style="color:var(--accent2); font-family:'JetBrains Mono',monospace;">#</code> as wildcards. Min 6 chars.
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <!-- Expiry Month Custom Select -->
+                <div class="field">
+                  <label class="field-label">Expiry Month</label>
+                  <div class="custom-select-wrapper" id="monthSelWrapper" data-value="rnd">
+                    <div class="custom-select-trigger">
+                      <span class="select-label">Random</span>
+                      <svg class="custom-select-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                    <div class="custom-select-dropdown">
+                      <div class="custom-select-option selected" data-value="rnd"><span class="option-check"></span><span class="option-text">Random</span></div>
+                      <div class="custom-select-option" data-value="01"><span class="option-check"></span><span class="option-text">01 — January</span></div>
+                      <div class="custom-select-option" data-value="02"><span class="option-check"></span><span class="option-text">02 — February</span></div>
+                      <div class="custom-select-option" data-value="03"><span class="option-check"></span><span class="option-text">03 — March</span></div>
+                      <div class="custom-select-option" data-value="04"><span class="option-check"></span><span class="option-text">04 — April</span></div>
+                      <div class="custom-select-option" data-value="05"><span class="option-check"></span><span class="option-text">05 — May</span></div>
+                      <div class="custom-select-option" data-value="06"><span class="option-check"></span><span class="option-text">06 — June</span></div>
+                      <div class="custom-select-option" data-value="07"><span class="option-check"></span><span class="option-text">07 — July</span></div>
+                      <div class="custom-select-option" data-value="08"><span class="option-check"></span><span class="option-text">08 — August</span></div>
+                      <div class="custom-select-option" data-value="09"><span class="option-check"></span><span class="option-text">09 — September</span></div>
+                      <div class="custom-select-option" data-value="10"><span class="option-check"></span><span class="option-text">10 — October</span></div>
+                      <div class="custom-select-option" data-value="11"><span class="option-check"></span><span class="option-text">11 — November</span></div>
+                      <div class="custom-select-option" data-value="12"><span class="option-check"></span><span class="option-text">12 — December</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Expiry Year Custom Select -->
+                <div class="field">
+                  <label class="field-label">Expiry Year</label>
+                  <div class="custom-select-wrapper" id="yearSelWrapper" data-value="rnd">
+                    <div class="custom-select-trigger">
+                      <span class="select-label">Random</span>
+                      <svg class="custom-select-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                    <div class="custom-select-dropdown">
+                      <!-- "Random" option first; year options appended by JS -->
+                      <div class="custom-select-option selected" data-value="rnd"><span class="option-check"></span><span class="option-text">Random</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <div class="field">
+                  <label class="field-label">CVV / CVC</label>
+                  <input type="text" id="cvvInput" placeholder="Random if blank" maxlength="4" oninput="updatePreview()" />
+                </div>
+                <div class="field">
+                  <label class="field-label">Quantity (1–100)</label>
+                  <input type="number" id="qtyInput" value="10" min="1" max="100" />
+                </div>
+              </div>
+
+              <!-- Output Format -->
+              <div class="field">
+                <label class="field-label">Output Format</label>
+                <div class="format-group">
+                  <button class="fmt-btn active" data-fmt="pipe"   onclick="setFormat(this)">CC|MM|YY|CVV</button>
+                  <button class="fmt-btn"         data-fmt="space"  onclick="setFormat(this)">CC MM YY CVV</button>
+                  <button class="fmt-btn"         data-fmt="comma"  onclick="setFormat(this)">CC,MM,YY,CVV</button>
+                  <button class="fmt-btn"         data-fmt="colon"  onclick="setFormat(this)">CC:MM:YY:CVV</button>
+                  <button class="fmt-btn"         data-fmt="cconly" onclick="setFormat(this)">CC Only</button>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-primary btn-full" onclick="generate()" style="flex:1; min-width:160px;">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Generate Cards
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="saveBinDialog()" title="Save current BIN">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                  </svg>
+                  Save BIN
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Output -->
+        <div style="display:flex; flex-direction:column; gap:0;">
+          <div class="panel" style="flex:1; display:flex; flex-direction:column;">
+            <div class="panel-header" style="justify-content:space-between;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="ph-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                </div>
+                <h2>Generated Cards</h2>
+              </div>
+              <span class="gen-progress" id="genCount">0 cards</span>
+            </div>
+
+            <!-- CC Table -->
+            <div style="padding:16px 16px 0; flex:1; display:flex; flex-direction:column; overflow:hidden;">
+              <div class="cc-table-wrap">
+                <div class="cc-table-head">
+                  <span>#</span>
+                  <span>Card Details</span>
+                  <span style="text-align:right;">Action</span>
+                </div>
+                <div class="cc-table-body" id="ccTableBody">
+                  <div class="empty-state">
+                    <div class="empty-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                    </div>
+                    <p>No cards generated yet.<br/>Configure and click Generate.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats bar -->
+            <div class="stats-bar" id="statsBar" style="display:none;">
+              <div class="stat-chip"><div class="stat-dot"></div>Total: <strong id="statTotal">0</strong></div>
+              <div class="stat-chip"><div class="stat-dot" style="background:var(--gold)"></div>Type: <strong id="statType">—</strong></div>
+              <div class="stat-chip"><div class="stat-dot" style="background:var(--green)"></div>BIN: <strong id="statBin">—</strong></div>
+            </div>
+
+            <!-- Actions -->
+            <div style="padding:16px; border-top:1px solid var(--border2);">
+              <div class="action-buttons" style="margin-bottom: 16px;">
+                <button class="btn btn-green btn-sm" onclick="copyAll()">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  Copy All
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="downloadTxt()">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="saveAllCCsDialog()">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                  </svg>
+                  Save All
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="clearCards()">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Clear
+                </button>
+              </div>
+              <label style="cursor:pointer; display:flex; align-items:center; gap:10px;">
+                <input type="checkbox" id="ccOnlyToggle" class="toggle-inp" />
+                <div class="toggle-wrap" onclick="event.stopPropagation()">
+                  <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                  <span class="toggle-label">Copy CC number only</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Saved BINs Tab -->
+    <div class="tab-content" id="tab-saved-bins">
+      <div class="panel">
+        <div class="panel-header" style="justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="ph-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <h2>Saved BINs</h2>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveBinDialog()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Add BIN
+          </button>
+        </div>
+        <div class="panel-body">
+          <div id="savedBinsList" class="saved-list"></div>
+          <div id="noBins" class="empty-state" style="padding:30px;">
+            <div class="empty-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <p>No saved BINs yet. Generate cards and save your BINs for quick access.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saved CCs Tab -->
+    <div class="tab-content" id="tab-saved-ccs">
+      <div class="panel">
+        <div class="panel-header" style="justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="ph-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h2>Saved Cards</h2>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="clearAllSavedCCs()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Clear All
+          </button>
+        </div>
+        <div class="panel-body">
+          <div id="savedCCsList" class="saved-list"></div>
+          <div id="noCCs" class="empty-state" style="padding:30px;">
+            <div class="empty-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <p>No saved cards yet. Save individual cards or entire batches from the generator.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.wrapper -->
+
+  <!-- Save BIN Modal -->
+  <div class="modal-overlay" id="modalSaveBin">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-title">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>
+        Save BIN
+      </div>
+      <div class="field">
+        <label class="field-label">BIN Name / Label</label>
+        <input type="text" id="saveBinName" placeholder="e.g. Visa Platinum US" />
+      </div>
+      <div class="field">
+        <label class="field-label">BIN / Pattern</label>
+        <input type="text" id="saveBinValue" placeholder="411111xxxxxxxxxx" />
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+        <div class="field" style="margin-bottom:0;">
+          <label class="field-label">Exp Month</label>
+          <input type="text" id="saveBinMonth" placeholder="Random" maxlength="2" />
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label class="field-label">Exp Year</label>
+          <input type="text" id="saveBinYear" placeholder="Random" maxlength="2" />
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label class="field-label">CVV</label>
+          <input type="text" id="saveBinCvv" placeholder="Random" maxlength="4" />
+        </div>
+      </div>
+      <p style="font-size:11px; color:var(--muted); margin-top:8px; line-height:1.6;">Leave month, year or CVV blank to use random values when generating.</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline btn-sm" onclick="closeModal('modalSaveBin')">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="confirmSaveBin()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          Save BIN
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save CC Modal -->
+  <div class="modal-overlay" id="modalSaveCC">
+    <div class="modal-box">
+      <div class="modal-title">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        Save Card(s)
+      </div>
+      <div class="field">
+        <label class="field-label">Collection Name</label>
+        <input type="text" id="saveCCName" placeholder="e.g. Batch #1 — Test" />
+      </div>
+      <div class="field">
+        <label class="field-label">Cards to save</label>
+        <textarea id="saveCCValue" rows="5" placeholder="Cards will be pre-filled..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline btn-sm" onclick="closeModal('modalSaveCC')">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="confirmSaveCC()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          Save Cards
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BIN Picker Modal -->
+  <div class="modal-overlay" id="modalBinPicker">
+    <div class="modal-box">
+      <div class="modal-title">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        Load Saved BIN
+      </div>
+      <div id="binPickerList" class="saved-list" style="max-height:280px; overflow-y:auto;"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline btn-sm" onclick="closeModal('modalBinPicker')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
